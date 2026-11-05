@@ -26,3 +26,13 @@ CI runs on Ubuntu and Windows with Python 3.11, 3.13, and 3.14. A successful pro
 Cancellation of a **long-running** operation and EDA descendant termination belong to the executor milestones (#4–#6) and remain `NOT_RUN`. Python 3.15 and actual Verilator invocation are also `NOT_RUN` until independently exercised.
 
 MCP Inspector or another standards-compliant client can provide additional manual acceptance. Use only synthetic public inputs and logs.
+
+## Real Verilator lint
+
+Linux CI installs distribution-packaged Verilator, probes `--version`, and invokes real MCP `lint_run` against public passing `good_top.sv` and failing `bad_top.sv`. It checks distinct `PASS`/`PASS_WITH_WARNINGS` and `FAIL` states, exit codes, real execution evidence, and artifacts.
+
+```bash
+VERILATOR_MCP_RUN_INTEGRATION=1 uv run python -m unittest discover -s tests -p 'test_lint_integration.py' -v
+```
+
+Without the flag, the test explicitly skips as `REAL_VERILATOR_NOT_RUN`. Windows runs actual process timeout/log bounds tests, but Verilator/MSYS2 remains `NOT_RUN` pending independent acceptance. See [LINT.en.md](LINT.en.md).

@@ -1,4 +1,4 @@
-"""Проверка регистрации интерфейса для автономной офлайн-диагностики."""
+"""Офлайн-проверка регистрации инструментов без подмены MCP acceptance."""
 
 import importlib
 import sys
@@ -35,12 +35,15 @@ class ServerStubTests(unittest.TestCase):
                 module = importlib.import_module(target)
                 server = module.create_server()
                 self.assertEqual(
-                    set(server.tools),
-                    {"server_info", "tool_status", "parse_diagnostics", "project_validate"},
+                    set(server.tools), {
+                        "server_info", "tool_status", "parse_diagnostics",
+                        "project_validate", "lint_run",
+                    },
                 )
                 info = server.tools["server_info"]()
-                self.assertEqual(info["stage"], "workspace_contract")
-                self.assertFalse(info["eda_execution_supported"])
+                self.assertEqual(info["stage"], "lint_only")
+                self.assertTrue(info["eda_execution_supported"])
+                self.assertFalse(info["simulation_supported"])
                 self.assertEqual(server.tools["parse_diagnostics"]("", limit=1)["count"], 0)
             finally:
                 sys.modules.pop(target, None)

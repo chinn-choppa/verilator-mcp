@@ -1,0 +1,5 @@
+{
+  "schema_version": 1,
+  "top": "bad_top",
+  "sources": ["rtl/bad_top.sv"]
+}

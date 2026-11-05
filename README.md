@@ -4,7 +4,7 @@
 
 Переносимый локальный MCP-сервер для анализа и верификации RTL через Verilator. Независимый проект для FPGA/ASIC-инженеров и любых совместимых AI-агентов.
 
-**Статус: экспериментальный, read-only workspace (0.0.1).** Реальный запуск lint, сборки и симуляции пока не реализован. Доказанная проверка manifest не является проверкой корректности RTL.
+**Статус: экспериментальный, реальный lint-only (0.0.1).** Verilator lint запускается только на явно разрешённом проекте. Сборка, моделирование и функциональная верификация пока не реализованы.
 
 ## Быстрый старт
 
@@ -44,8 +44,9 @@ uv run verilator-mcp
 | `tool_status` | Безвредное обнаружение установленного Verilator |
 | `parse_diagnostics` | Ограниченный структурированный разбор логов |
 | `project_validate` | Проверка локального JSON manifest и допустимых путей без выполнения EDA |
+| `lint_run` | Реальный ограниченный `verilator --lint-only`; никаких результатов симуляции |
 
-Подробности: [workspace](docs/WORKSPACE.md), [контракт инструментов](docs/TOOL_CONTRACT.md), [проверки](docs/TESTING.md), [совместимость](docs/COMPATIBILITY.md), [архитектура](docs/ARCHITECTURE.md), [план](docs/ROADMAP.md).
+Подробности: [lint](docs/LINT.md), [workspace](docs/WORKSPACE.md), [контракт инструментов](docs/TOOL_CONTRACT.md), [проверки](docs/TESTING.md), [совместимость](docs/COMPATIBILITY.md), [архитектура](docs/ARCHITECTURE.md), [план](docs/ROADMAP.md).
 
 ```bash
 uv run python -m unittest discover -s tests -v

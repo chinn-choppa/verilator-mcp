@@ -10,6 +10,7 @@
 | `tool_status()` | Обнаружение Verilator без выполнения | Нет |
 | `parse_diagnostics(text, limit=200)` | Консервативный парсер до 1 МиБ / 200 записей | Нет |
 | `project_validate(manifest_path)` | Проверка manifest в операторском workspace | Нет |
+| `lint_run(manifest_path, timeout_seconds=60)` | Запуск ограниченного Verilator `--lint-only` | Да |
 
 `tool_status` возвращает `tool`, `state`, `configured`, `executed=false`. Состояния: `DETECTED_UNVERIFIED`, `NOT_FOUND`, `INVALID_OVERRIDE`. Пути локальной установки не раскрываются.
 
@@ -17,6 +18,6 @@
 
 `project_validate` принимает **только относительный путь к JSON manifest**; корни конфигурируются сервером через `VERILATOR_MCP_WORKSPACE_ROOT` и `VERILATOR_MCP_ARTIFACT_ROOT`. Успешный результат: `state=VALID`, `executed=false`, `manifest`, `config_sha256`, `project` с нормализованными `top`, `sources`, `include_dirs`, `defines`, `parameters`, `testbench_top`. При ошибке MCP возвращает error, не фиктивный `VALID`. См. [контракт workspace](WORKSPACE.md).
 
-`project_validate` не компилирует исходники, не открывает RTL для чтения содержимого и не создаёт артефакты. Следующие этапы добавят отдельные `lint_run`, `build_run` и `simulation_run` с реальными кодами завершения и доказательствами исполнения.
+`project_validate` не компилирует исходники, не открывает RTL для чтения содержимого и не создаёт артефакты. Операция `lint_run` уже использует настоящий исполняемый файл после проверки версии. Возвращает `lint_status`, `verification_verdict=NOT_RUN`, `executed`, `exit_code`, `tool_version`, `duration_ms`, `diagnostics`, `logs_truncated`, хеши входной конфигурации и явные ссылки на ограниченные артефакты. Состояния `NOT_AVAILABLE` и `NOT_RUN` не являются успешным lint. Полный контракт, включая `TIMEOUT`, `INPUT_CHANGED`, `INCOMPLETE` и предупреждения: [LINT.md](LINT.md). Следующие этапы добавят отдельные `build_run` и `simulation_run`.
 
 Сервер не предоставляет `run_command`, произвольный shell, Tcl/DO и свободные флаги Verilator. Verilator не является полной заменой 4-state симулятору.

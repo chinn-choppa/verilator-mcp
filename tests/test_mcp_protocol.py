@@ -1,4 +1,4 @@
-"""Настоящие in-memory JSON-RPC и stdio проверки официального MCP SDK."""
+"""Реальные MCP JSON-RPC + stdio проверки, без заглушек протокола."""
 
 from __future__ import annotations
 
@@ -14,7 +14,9 @@ from mcp import Client, StdioServerParameters
 
 from verilator_mcp.server import create_server
 
-EXPECTED_TOOLS = {"server_info", "tool_status", "parse_diagnostics", "project_validate"}
+EXPECTED_TOOLS = {
+    "server_info", "tool_status", "parse_diagnostics", "project_validate", "lint_run"
+}
 
 
 class MCPProtocolTests(unittest.IsolatedAsyncioTestCase):
@@ -25,7 +27,8 @@ class MCPProtocolTests(unittest.IsolatedAsyncioTestCase):
             self.assertTrue(all(item.input_schema for item in listed.tools))
             info = await client.call_tool("server_info", {})
             self.assertFalse(info.is_error)
-            self.assertFalse(info.structured_content["eda_execution_supported"])
+            self.assertTrue(info.structured_content["eda_execution_supported"])
+            self.assertFalse(info.structured_content["simulation_supported"])
             parsed = await client.call_tool("parse_diagnostics", {
                 "text": "%Error-UNSUPPORTED: rtl/top.sv:9:2: unsupported",
                 "limit": 10,
@@ -63,7 +66,7 @@ class MCPProtocolTests(unittest.IsolatedAsyncioTestCase):
             self.assertFalse(diagnostics.is_error)
             self.assertEqual(diagnostics.structured_content["count"], 1)
 
-    async def test_workspace_over_real_mcp_client(self) -> None:
+    async def test_workspace_and_missing_linter_via_real_client(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp) / "workspace"
             artifacts = Path(tmp) / "artifacts"
@@ -76,6 +79,7 @@ class MCPProtocolTests(unittest.IsolatedAsyncioTestCase):
             with patch.dict(os.environ, {
                 "VERILATOR_MCP_WORKSPACE_ROOT": str(root),
                 "VERILATOR_MCP_ARTIFACT_ROOT": str(artifacts),
+                "VERILATOR_MCP_EXECUTABLE": str(root / "not-installed"),
             }):
                 async with Client(create_server(), mode="legacy") as client:
                     result = await client.call_tool("project_validate", {
@@ -83,9 +87,17 @@ class MCPProtocolTests(unittest.IsolatedAsyncioTestCase):
                     })
                     self.assertFalse(result.is_error)
                     self.assertEqual(result.structured_content["project"]["top"], "top")
+                    missing = await client.call_tool("lint_run", {
+                        "manifest_path": "project.json", "timeout_seconds": 3,
+                    })
+                    self.assertFalse(missing.is_error)
+                    self.assertEqual(missing.structured_content["lint_status"], "NOT_AVAILABLE")
+                    self.assertFalse(missing.structured_content["executed"])
+                    self.assertEqual(missing.structured_content["verification_verdict"], "NOT_RUN")
+                    self.assertEqual(list(artifacts.iterdir()), [])
                     try:
-                        bad = await client.call_tool("project_validate", {
-                            "manifest_path": "../private.json",
+                        bad = await client.call_tool("lint_run", {
+                            "manifest_path": "../private.json", "timeout_seconds": 0,
                         })
                     except Exception:
                         pass

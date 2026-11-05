@@ -3,6 +3,9 @@
 ## [Unreleased]
 
 ### Added / Добавлено
+- Real bounded Verilator lint with version probe, exit status, source hashes, diagnostics and local artifacts (#4).
+- Реальный lint-only, управление дочерними процессами, ограничение журналов и проверка RTL на открытых фикстурах.
+- Explicitly no simulation verdict and no free shell or native filelist arguments.
 - Versioned read-only RTL workspace manifest, bounded nested JSON filelists and canonical-path validation (#3).
 - Версионированное описание проекта с проверкой путей, глубины вложенности, ограничением входов и защите от выхода за workspace.
 - Real MCP client tests for in-memory JSON-RPC and stdio (#2).
