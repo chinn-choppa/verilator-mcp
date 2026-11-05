@@ -1,0 +1,18 @@
+name: Предложение
+description: Новый проверяемый сценарий или поддержка инструмента
+title: "feat: "
+body:
+  - type: textarea
+    id: use_case
+    attributes:
+      label: Сценарий пользователя
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Чем это лучше существующих CLI/MCP
+  - type: textarea
+    id: constraints
+    attributes:
+      label: Ограничения совместимости, прав и лицензий

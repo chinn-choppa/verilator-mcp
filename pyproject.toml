@@ -1,0 +1,28 @@
+[build-system]
+requires = ["hatchling>=1.27,<2"]
+build-backend = "hatchling.build"
+
+[project]
+name = "verilator-mcp"
+version = "0.0.1"
+description = "Переносимый локальный MCP-сервер для симуляции, диагностики и верификации RTL с Verilator"
+readme = "README.md"
+requires-python = ">=3.11"
+license = "Apache-2.0"
+authors = [{name = "chinn-choppa"}]
+keywords = ["mcp", "fpga", "rtl", "eda", "verilator"]
+dependencies = ["mcp==2.3.0"]
+
+[project.scripts]
+verilator-mcp = "verilator_mcp.server:main"
+
+[project.urls]
+Repository = "https://github.com/chinn-choppa/verilator-mcp"
+Issues = "https://github.com/chinn-choppa/verilator-mcp/issues"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/verilator_mcp"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"

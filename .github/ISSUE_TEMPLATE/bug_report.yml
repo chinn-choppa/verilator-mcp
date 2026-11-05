@@ -1,0 +1,26 @@
+name: Ошибка
+description: Воспроизводимый дефект без закрытых данных
+title: "bug: "
+labels: [bug]
+body:
+  - type: textarea
+    id: summary
+    attributes:
+      label: Что произошло
+    validations:
+      required: true
+  - type: textarea
+    id: reproducer
+    attributes:
+      label: Минимальный публичный пример
+      description: Не прикладывайте закрытые RTL, лицензии и секреты.
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Версия MCP, EDA-продукта и ОС
+  - type: textarea
+    id: logs
+    attributes:
+      label: Обезличенный вывод и ожидаемый результат
