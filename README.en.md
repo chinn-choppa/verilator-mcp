@@ -4,7 +4,7 @@
 
 A portable, local-first Verilator MCP server for RTL engineering with any compatible AI agent. Independently maintained for the FPGA/ASIC community.
 
-**Status: experimental, read-only workspace (0.0.1).** Real lint, build, and simulation execution are not yet implemented. A validated manifest is not evidence that the RTL is correct.
+**Status: experimental, real lint-only (0.0.1).** Verilator lint runs only against an operator-approved workspace. Building, simulating and functional verification are not implemented yet.
 
 ## Quick start
 
@@ -44,8 +44,9 @@ Actual MCP client configuration formats vary. The operator sets existing, non-ov
 | `tool_status` | Read-only Verilator discovery |
 | `parse_diagnostics` | Bounded structured parsing of diagnostic text |
 | `project_validate` | Validate a local JSON manifest and paths without EDA execution |
+| `lint_run` | Run bounded real `verilator --lint-only`; never claim simulation PASS |
 
-Read the [workspace contract](docs/WORKSPACE.en.md), [tool contract](docs/TOOL_CONTRACT.en.md), [testing](docs/TESTING.en.md), [compatibility](docs/COMPATIBILITY.en.md), [architecture](docs/ARCHITECTURE.md), and [roadmap](docs/ROADMAP.md).
+Read the [lint contract](docs/LINT.en.md), [workspace contract](docs/WORKSPACE.en.md), [tool contract](docs/TOOL_CONTRACT.en.md), [testing](docs/TESTING.en.md), [compatibility](docs/COMPATIBILITY.en.md), [architecture](docs/ARCHITECTURE.md), and [roadmap](docs/ROADMAP.md).
 
 ```bash
 uv run python -m unittest discover -s tests -v
