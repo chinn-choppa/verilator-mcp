@@ -3,11 +3,11 @@
 ## [Unreleased]
 
 ### Added / Добавлено
-- Тесты реальных MCP `initialize`, `tools/list`, `tools/call` через JSON-RPC в памяти и локальный stdio.
-- Real MCP client protocol tests using the official v2 SDK, in-memory and stdio.
-- CI matrix with `uv` on Linux/Windows and Python 3.11/3.13/3.14.
-- Двуязычные руководства по тестированию и совместимости / bilingual testing and compatibility guides.
+- Versioned read-only RTL workspace manifest, bounded nested JSON filelists and canonical-path validation (#3).
+- Версионированное описание проекта с проверкой путей, глубины вложенности, ограничением входов и защите от выхода за workspace.
+- Real MCP client tests for in-memory JSON-RPC and stdio (#2).
+- Настоящие протокольные проверки на Python 3.11/3.13/3.14 и Windows/Linux; двуязычная документация.
 
 ### Limits / Ограничения
-- No EDA execution is introduced in this change; cancellation, Verilator and Python 3.15 acceptance remain NOT_RUN.
-- Запуск Verilator, отмена длительных команд и приёмка Python 3.15 требуют самостоятельной проверки.
+- Neither project validation nor a completed MCP request proves RTL correctness or simulation success.
+- Запуск Verilator, отмена длительных команд и приёмка Python 3.15 пока NOT_RUN.

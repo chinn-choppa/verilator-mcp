@@ -2,13 +2,13 @@
 
 [Русский](README.md) · [Contributing](CONTRIBUTING.md) · [Security](SECURITY.md)
 
-Community-focused, local-first MCP adapter for **Verilator**. This is an independently maintained open-source project, not an official vendor product.
+A portable, local-first Verilator MCP server for RTL engineering with any compatible AI agent. Independently maintained for the FPGA/ASIC community.
 
-**Status: experimental bootstrap (0.0.1).** The initial release exposes a minimal MCP server, installation detection and bounded diagnostic parsing. It does **not** execute synthesis, simulation, hardware programming or arbitrary shell commands.
+**Status: experimental, read-only workspace (0.0.1).** Real lint, build, and simulation execution are not yet implemented. A validated manifest is not evidence that the RTL is correct.
 
-## Setup
+## Quick start
 
-Python 3.11+ and `uv` are required:
+Requires Python 3.11+ and `uv`:
 
 ```bash
 git clone https://github.com/chinn-choppa/verilator-mcp.git
@@ -17,15 +17,40 @@ uv sync
 uv run verilator-mcp
 ```
 
-MCP tools: `server_info`, `tool_status`, `parse_diagnostics`. Use a local stdio-capable MCP client and configure it to launch the installed command. A real MCP client test is separate from Python unit tests.
+Example for clients supporting the `mcpServers` configuration key (replace with trusted local paths):
 
-## Development
-
-```bash
-python -m unittest discover -s tests -v
-python -m compileall -q src tests
+```json
+{
+  "mcpServers": {
+    "verilator-mcp": {
+      "command": "uv",
+      "args": ["--directory", "/absolute/path/to/verilator-mcp", "run", "verilator-mcp"],
+      "env": {
+        "VERILATOR_MCP_WORKSPACE_ROOT": "/absolute/path/to/workspace",
+        "VERILATOR_MCP_ARTIFACT_ROOT": "/absolute/path/to/separate-artifacts"
+      }
+    }
+  }
+}
 ```
 
-Review [architecture](docs/ARCHITECTURE.md), [roadmap](docs/ROADMAP.md) and [security](SECURITY.md). Russian is used for most engineering documentation; international contributions are welcome, including improvements to English documentation.
+Actual MCP client configuration formats vary. The operator sets existing, non-overlapping workspace and artifact directories.
 
-Licensed under Apache-2.0. No proprietary EDA executables, licenses or private project data are distributed here.
+## MCP tools
+
+| Tool | Behavior |
+| --- | --- |
+| `server_info` | Server stage and available operations |
+| `tool_status` | Read-only Verilator discovery |
+| `parse_diagnostics` | Bounded structured parsing of diagnostic text |
+| `project_validate` | Validate a local JSON manifest and paths without EDA execution |
+
+Read the [workspace contract](docs/WORKSPACE.en.md), [tool contract](docs/TOOL_CONTRACT.en.md), [testing](docs/TESTING.en.md), [compatibility](docs/COMPATIBILITY.en.md), [architecture](docs/ARCHITECTURE.md), and [roadmap](docs/ROADMAP.md).
+
+```bash
+uv run python -m unittest discover -s tests -v
+```
+
+Verilator primarily uses two-state semantics and does not replace a full four-state simulator. Successful lint or testbench execution alone does not prove RTL functionality.
+
+Apache-2.0 licensed. Not affiliated with the official Verilator maintainers.

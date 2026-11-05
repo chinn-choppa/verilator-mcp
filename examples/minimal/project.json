@@ -1,0 +1,7 @@
+{
+  "schema_version": 1,
+  "top": "counter",
+  "sources": ["rtl/counter.sv"],
+  "defines": {"SYNTHESIS": "0"},
+  "parameters": {"WIDTH": 8}
+}
