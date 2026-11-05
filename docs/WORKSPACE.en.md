@@ -58,7 +58,7 @@ Parameter values are integers 0..2147483647. Define values are ASCII letter/digi
 ## Testing
 
 ```bash
-uv run python -m unittest tests.test_workspace -v
+uv run python -m unittest discover -s tests -p 'test_workspace.py' -v
 ```
 
 `project_validate("project.json")` returns `state=VALID` and `executed=false` after validating the configuration. This does **not** establish a lint, build, or simulation PASS. A rejected MCP call is an error, not a successful verification.

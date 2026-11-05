@@ -58,7 +58,7 @@
 ## Проверка
 
 ```bash
-uv run python -m unittest tests.test_workspace -v
+uv run python -m unittest discover -s tests -p 'test_workspace.py' -v
 ```
 
 `project_validate("project.json")` возвращает `state=VALID` и `executed=false` только после полной проверки конфигурации. Это **не** означает успешный lint, build или simulation. Отказ MCP приводит к ошибке инструмента и не считается PASS.
