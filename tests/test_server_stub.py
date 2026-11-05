@@ -1,4 +1,4 @@
-"""Синтетический тест регистрации инструментов без внешнего MCP SDK."""
+"""Проверка регистрации интерфейса для автономной офлайн-диагностики."""
 
 import importlib
 import sys
@@ -19,7 +19,7 @@ class MCPStub:
         return register
 
     def run(self, transport):
-        raise AssertionError("Нельзя запускать настоящий сервер из stub теста")
+        raise AssertionError("В stub-тесте запуск сервера запрещён")
 
 
 class ServerStubTests(unittest.TestCase):
@@ -34,12 +34,14 @@ class ServerStubTests(unittest.TestCase):
             try:
                 module = importlib.import_module(target)
                 server = module.create_server()
-                self.assertEqual(set(server.tools), {"server_info", "tool_status", "parse_diagnostics"})
+                self.assertEqual(
+                    set(server.tools),
+                    {"server_info", "tool_status", "parse_diagnostics", "project_validate"},
+                )
                 info = server.tools["server_info"]()
-                self.assertEqual(info["stage"], "bootstrap")
+                self.assertEqual(info["stage"], "workspace_contract")
                 self.assertFalse(info["eda_execution_supported"])
-                found = server.tools["parse_diagnostics"]("", limit=1)
-                self.assertEqual(found["count"], 0)
+                self.assertEqual(server.tools["parse_diagnostics"]("", limit=1)["count"], 0)
             finally:
                 sys.modules.pop(target, None)
 
