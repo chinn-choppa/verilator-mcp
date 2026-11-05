@@ -1,30 +1,28 @@
 # Проверка проекта
 
-## Быстрые проверки без EDA и внешней сети
+[English](TESTING.en.md)
 
-```bash
-PYTHONPATH=src python -m unittest discover -s tests -v
-python -m compileall -q src tests
-```
+## Проверки MCP без установленного Verilator
 
-PowerShell:
-
-```powershell
-$env:PYTHONPATH = "src"
-python -m unittest discover -s tests -v
-python -m compileall -q src tests
-Remove-Item Env:PYTHONPATH
-```
-
-## При наличии SDK MCP
+Все проверки используют официальный SDK, а не подмену сервера.
 
 ```bash
 uv sync
-uv run verilator-mcp
+uv run python -m compileall -q src tests
+uv run python -m unittest discover -s tests -v
 ```
 
-Подключить MCP Inspector либо клиент Codex/Claude/OpenCode, проверить реальный `tools/list`, затем вызвать `server_info` и `parse_diagnostics` на синтетических данных. Только после успешного фактического вызова инструмента можно фиксировать `MCP_TOOL_PASS`. Простой старт процесса или наличие пакета означает максимум `INSTALLED`.
+`tests/test_mcp_protocol.py` проверяет два отдельных сценария:
 
-## Реальное EDA-тестирование
+1. Настоящий `initialize`, `tools/list`, `tools/call` через клиент MCP и JSON-RPC в памяти (`mode="legacy"`).
+2. Запуск реального stdio-процесса посредством `StdioServerParameters` и повторные `tools/list` / `tools/call`.
 
-**Пока не предусмотрено** в bootstrap. После появления команд выполняйте на публичных минимальных RTL-проектах: lint, негативный кейс, сбой лицензии/тайм-аут, успешное завершение по самопроверяющемуся тесту, повреждённый файл, неверный путь и ограничение каталогов. Записывайте версии и SHA используемых исходников.
+Негативные сценарии включают неверные типы и превышение лимита текста. При неуспешном вызове тест не допускает `is_error=false`. Любые посторонние данные в stdout нарушают протокол stdio.
+
+CI выполняет эти тесты на Ubuntu и Windows с Python 3.11, 3.13, 3.14. Успешный протокольный вызов означает только `MCP_TOOL_PASS`, но не `EDA_PASS`.
+
+## Границы приёмки
+
+Проверка отмены **длительной** операции и завершения дерева дочерних EDA-процессов относится к реализации исполнителя (#4–#6); пока `NOT_RUN`. Python 3.15 и реальные запуски Verilator также `NOT_RUN`, пока не получены независимые результаты.
+
+Для ручной проверки можно дополнительно подключить MCP Inspector либо другой стандартный MCP-клиент. Логи содержат только открытые синтетические данные.
