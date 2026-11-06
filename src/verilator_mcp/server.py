@@ -57,7 +57,10 @@ def create_server() -> MCPServer:
         return await lint_run_project(manifest_path, timeout_seconds)
 
     @server.tool()
-    async def build_run(\n        manifest_path: str, timeout_seconds: int = 180,\n        coverage_line: bool = False, assertions: bool = True,\n    ) -> dict[str, object]:
+    async def build_run(
+        manifest_path: str, timeout_seconds: int = 180,
+        coverage_line: bool = False, assertions: bool = True,
+    ) -> dict[str, object]:
         """Собрать существующий SystemVerilog тестбенч, не запуская симуляцию."""
         return await build_run_project(manifest_path, timeout_seconds, coverage_line, assertions)
 

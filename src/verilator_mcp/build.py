@@ -49,7 +49,9 @@ def _hash_file(path: Path, max_bytes: int = 268_435_456) -> str:
     return digest.hexdigest()
 
 
-def _build_arguments(\n    project: RTLProject, folder: Path, *, coverage_line: bool = False, assertions: bool = True,\n) -> list[str]:
+def _build_arguments(
+    project: RTLProject, folder: Path, *, coverage_line: bool = False, assertions: bool = True,
+) -> list[str]:
     args = _arguments(project, folder)
     args[0] = "--binary"
     args.insert(1, "--timing")
