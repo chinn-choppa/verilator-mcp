@@ -13,7 +13,7 @@ No free-form Verilator flags. Boolean types are strictly validated. The build re
 
 ## Capturing runtime data
 
-When `coverage_line` was enabled, `simulation_run` appends `+verilator+coverage+file+<absolute sim-ID directory>/coverage.dat`. The MCP caller cannot choose the path. The recorded `coverage_status` is:
+When `coverage_line` was enabled, `simulation_run` uses Verilator's default `coverage.dat` filename inside its unique `sim-ID` working directory. This avoids a runtime switch unsupported by older Verilator versions (including 5.020); the MCP caller cannot choose the path. The recorded `coverage_status` is:
 
 | Status | Meaning |
 | --- | --- |

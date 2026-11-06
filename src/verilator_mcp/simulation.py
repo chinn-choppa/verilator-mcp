@@ -196,8 +196,9 @@ async def simulation_run_project(
         "+VERILATOR_MCP_TOKEN=" + nonce,
     ]
     coverage_enabled = build.get("coverage_line_enabled", False)
-    if coverage_enabled:
-        argv.append("+verilator+coverage+file+" + str(folder / "coverage.dat"))
+    # Старые Verilator (включая 5.020) не поддерживают runtime-ключ
+    # +verilator+coverage+file+... . Используем стандартное coverage.dat
+    # в уникальном cwd каждой симуляции, не доверяя путь MCP-клиенту.
     evidence = {
         "run_id": run_id, "build_id": build_id, "seed": seed,
         "command": ["<BUILT_BINARY>", argv[1], "+VERILATOR_MCP_TOKEN=<PER_RUN_TOKEN>"],
@@ -207,6 +208,7 @@ async def simulation_run_project(
         "timeout_seconds": timeout_seconds,
         "criterion": "exit_code==0 AND exact token line AND Verilog $finish",
         "coverage_line_enabled": coverage_enabled,
+        "coverage_file": "coverage.dat" if coverage_enabled else None,
         "assertions_enabled": build.get("assertions_enabled", False),
     }
     _save_artifact(folder / "request.json", json.dumps(evidence, ensure_ascii=False, indent=2))
