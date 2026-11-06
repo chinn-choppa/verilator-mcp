@@ -83,6 +83,11 @@ def _validated_build(
         or not _SHA256.fullmatch(result["binary_sha256"])
     ):
         raise ManifestError("Несоответствие идентификаторов исходников и бинарника")
+    for key in ("coverage_line_enabled", "assertions_enabled"):
+        if request.get(key, False) is not result.get(key, False):
+            raise ManifestError("Несогласованные флаги инструментированной сборки")
+        if type(result.get(key, False)) is not bool:
+            raise ManifestError("Некорректный флаг инструментирования")
     versions = result.get("tool_versions")
     hashes = result.get("tool_sha256")
     if (
@@ -135,6 +140,27 @@ def _classify_run(
     return "EXIT_ZERO_UNVERIFIED", "INCONCLUSIVE", finish, fatal, marker
 
 
+def _raw_coverage_state(folder: Path, enabled: bool) -> str:
+    """Факт обнаружения артефакта; не приравнивать отсутствие к нулевому покрытию."""
+    if not enabled:
+        return "DISABLED"
+    path = folder / "coverage.dat"
+    if not path.exists():
+        return "NOT_OBSERVED"
+    try:
+        checked = path.resolve(strict=True)
+        if checked.parent != folder or not checked.is_file():
+            return "UNSAFE"
+        size = checked.stat().st_size
+    except (OSError, RuntimeError):
+        return "UNREADABLE"
+    if size == 0:
+        return "EMPTY"
+    if size > 16_777_216:
+        return "TOO_LARGE"
+    return "RECORDED"
+
+
 async def simulation_run_project(
     build_id: str, timeout_seconds: int = 30, seed: int = 1,
 ) -> dict[str, object]:
@@ -169,6 +195,9 @@ async def simulation_run_project(
         "+verilator+seed+" + str(seed),
         "+VERILATOR_MCP_TOKEN=" + nonce,
     ]
+    coverage_enabled = build.get("coverage_line_enabled", False)
+    if coverage_enabled:
+        argv.append("+verilator+coverage+file+" + str(folder / "coverage.dat"))
     evidence = {
         "run_id": run_id, "build_id": build_id, "seed": seed,
         "command": ["<BUILT_BINARY>", argv[1], "+VERILATOR_MCP_TOKEN=<PER_RUN_TOKEN>"],
@@ -177,6 +206,8 @@ async def simulation_run_project(
         "tool_versions": build["tool_versions"],
         "timeout_seconds": timeout_seconds,
         "criterion": "exit_code==0 AND exact token line AND Verilog $finish",
+        "coverage_line_enabled": coverage_enabled,
+        "assertions_enabled": build.get("assertions_enabled", False),
     }
     _save_artifact(folder / "request.json", json.dumps(evidence, ensure_ascii=False, indent=2))
     try:
@@ -199,6 +230,12 @@ async def simulation_run_project(
     status, verdict, finish, fatal, marker = _classify_run(
         proc, "VERILATOR_MCP_PASS:" + nonce, binary_changed=binary_changed
     )
+    coverage_state = _raw_coverage_state(folder, coverage_enabled)
+    assertion_state = (
+        "NOT_ENABLED" if not build.get("assertions_enabled", False)
+        else "FAILURE_OBSERVED" if "Assertion failed" in proc.stdout + proc.stderr
+        else "NO_FAILURE_OBSERVED"
+    )
     result = {
         "operation": "simulation",
         "run_status": status,
@@ -214,6 +251,8 @@ async def simulation_run_project(
         "finish_observed": finish,
         "fatal_observed": fatal,
         "pass_marker_observed": marker,
+        "coverage_status": coverage_state,
+        "assertion_observation": assertion_state,
         "binary_sha256": build["binary_sha256"],
         "config_sha256": request["config_sha256"],
         "tool_versions": build["tool_versions"],
@@ -225,6 +264,7 @@ async def simulation_run_project(
             "result": run_id + "/result.json",
             "stdout": run_id + "/stdout.log",
             "stderr": run_id + "/stderr.log",
+            **({"coverage_raw": run_id + "/coverage.dat"} if coverage_state == "RECORDED" else {}),
         },
     }
     _save_artifact(folder / "stdout.log", proc.stdout)

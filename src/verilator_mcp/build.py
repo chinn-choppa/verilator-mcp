@@ -49,10 +49,14 @@ def _hash_file(path: Path, max_bytes: int = 268_435_456) -> str:
     return digest.hexdigest()
 
 
-def _build_arguments(project: RTLProject, folder: Path) -> list[str]:
+def _build_arguments(\n    project: RTLProject, folder: Path, *, coverage_line: bool = False, assertions: bool = True,\n) -> list[str]:
     args = _arguments(project, folder)
     args[0] = "--binary"
     args.insert(1, "--timing")
+    if assertions:
+        args.insert(2, "--assert")
+    if coverage_line:
+        args.insert(2, "--coverage-line")
     args[args.index("--top-module") + 1] = project.testbench_top
     return args
 
@@ -68,10 +72,15 @@ def _output_binary(project: RTLProject, folder: Path) -> Path:
     return resolved
 
 
-async def build_run_project(manifest_path: str, timeout_seconds: int = 180) -> dict[str, object]:
+async def build_run_project(
+    manifest_path: str, timeout_seconds: int = 180,
+    coverage_line: bool = False, assertions: bool = True,
+) -> dict[str, object]:
     """Сборка SV testbench, не выполняющая полученный бинарник."""
     if type(timeout_seconds) is not int or not 10 <= timeout_seconds <= 600:
         raise ManifestError("timeout_seconds для сборки должен быть целым 10..600")
+    if type(coverage_line) is not bool or type(assertions) is not bool:
+        raise ManifestError("coverage_line и assertions должны быть булевыми значениями")
     project = validate_manifest(manifest_path)
     if not project.testbench_top:
         raise ManifestError("Для сборки требуется testbench_top в manifest")
@@ -97,13 +106,15 @@ async def build_run_project(manifest_path: str, timeout_seconds: int = 180) -> d
     folder = project.artifact_root / run_id
     folder.mkdir(mode=0o700, exist_ok=False)
 
-    args = _build_arguments(project, folder)
+    args = _build_arguments(project, folder, coverage_line=coverage_line, assertions=assertions)
     build_request = {
         **config, "build_id": run_id,
         "argv": ["<VERILATOR>", *[_public_text(x, project, executable) for x in args]],
         "source_sha256": hashes,
         "source_hash_scope": "explicit_sources_only",
         "timeout_seconds": timeout_seconds,
+        "coverage_line_enabled": coverage_line,
+        "assertions_enabled": assertions,
     }
     _save_artifact(folder / "request.json", json.dumps(build_request, indent=2, ensure_ascii=False))
 
@@ -196,6 +207,8 @@ async def build_run_project(manifest_path: str, timeout_seconds: int = 180) -> d
         "duration_ms": proc.duration_ms,
         "logs_truncated": truncated,
         "build_id": run_id,
+        "coverage_line_enabled": coverage_line,
+        "assertions_enabled": assertions,
         "tool_versions": versions,
         "tool_sha256": tool_hashes,
         "config_sha256": config["config_sha256"],

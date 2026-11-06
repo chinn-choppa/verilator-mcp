@@ -1,0 +1,47 @@
+# Наблюдаемые данные покрытия и assertions (M3, первый этап)
+
+[English](COVERAGE.en.md) · [Сборка](BUILD.md) · [Симуляция](SIMULATION.md)
+
+## Инструментированная сборка
+
+`build_run(manifest_path, timeout_seconds=180, coverage_line=false, assertions=true)` теперь поддерживает два ограниченных переключателя:
+
+- `coverage_line=true` добавляет **только** `--coverage-line` на этапе компиляции, без неподтверждённых режимов покрытия.
+- `assertions=true` добавляет `--assert`, что важно для версий Verilator до 5.038, где assertions по умолчанию выключены.
+
+Никаких свободных флагов Verilator. Булевы типы проверяются строго. В результате сборки фиксируются `coverage_line_enabled` и `assertions_enabled`.
+
+## Сбор данных при симуляции
+
+При активном `coverage_line` команда `simulation_run` сама добавляет `+verilator+coverage+file+<абсолютный каталог sim-ID>/coverage.dat`. Клиент не выбирает путь. После запуска сервер фиксирует `coverage_status`:
+
+| Статус | Значение |
+| --- | --- |
+| `DISABLED` | Сборка не инструментирована |
+| `NOT_OBSERVED` | Ожидаемый файл не создан |
+| `EMPTY` | Файл существует, но имеет нулевой размер |
+| `RECORDED` | Ненулевой файл покрытия записан и ограничен по размеру |
+| `TOO_LARGE`, `UNREADABLE`, `UNSAFE` | Файл превышает лимит, недоступен или небезопасен |
+
+**Ни один из этих статусов не означает 0% покрытия.** При некорректных или отсутствующих данных проценты не рассчитываются.
+
+`assertion_observation` отдельно указывает `NOT_ENABLED`, `FAILURE_OBSERVED` либо `NO_FAILURE_OBSERVED`. Отсутствие наблюдаемой ошибки assertion **не** означает прохождения всех assertions. Результат самопроверяющегося тестбенча по-прежнему определяется только контрактом `verification_verdict`.
+
+## Отдельный отчёт
+
+`coverage_report(run_id, timeout_seconds=20)` читает **только** `sim-<uuid>` из разрешённого каталога артефактов. При `RECORDED` выполняет доверенный `verilator_coverage --write-info`, сохраняет `coverage.info` и публикует сводку по LCOV `SF`/`DA`: количество наблюдённых строк, покрытых строк и источник. Абсолютные пути вне workspace в ответах скрываются.
+
+`report_status=READY` возникает только при реальных строках `DA` и успешном выполнении конвертера. Возможны `NOT_ENABLED`, `NOT_OBSERVED`, `EMPTY`, `NOT_AVAILABLE`, `INVALID`, `INCOMPLETE`, `TOOL_FAIL`, `TIMEOUT` и другие диагностические состояния. LCOV анализируется в пределах 1 МиБ/20 000 строк покрытия; выход `coverage.dat` ограничен 16 МиБ, stdout/stderr — 64 КиБ.
+
+Сводка отражает **только измеренную строковую метрику LCOV**, а не функциональное, полное assertion-, toggle- или branch-coverage. Статусы сборки, симуляции и покрытия не объединяются в фиктивный PASS.
+
+## Проверка
+
+```bash
+uv run python -m unittest discover -s tests -p 'test_coverage_unit.py' -v
+VERILATOR_MCP_RUN_INTEGRATION=1 uv run python -m unittest discover -s tests -p 'test_coverage_integration.py' -v
+```
+
+Ubuntu CI устанавливает реальный Verilator и `verilator_coverage`, запускает открытый SystemVerilog-дизайн, проверяет создание `coverage.dat`, конвертацию в LCOV и положительный счётчик покрытых строк. Windows/MSYS2 EDA — `NOT_RUN` до независимой проверки.
+
+**Ограничения:** локальный исполняемый код не изолирован средствами ОС; исходники, include и артефакты могут быть изменены другим процессом с теми же правами. Процент покрытия — не доказательство функциональной корректности. Многослучайные регрессии и объединение покрытия будут отдельным PR в рамках #7.
