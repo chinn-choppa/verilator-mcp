@@ -66,7 +66,10 @@ async def regression_run_project(
     for case in cases:
         if not _BUILD_ID.fullmatch(case.build_id):
             raise ManifestError("Недопустимый build_id")
-        _validated_build(artifact_root, case.build_id)
+        try:
+            _validated_build(artifact_root, case.build_id)
+        except (OSError, RuntimeError) as exc:
+            raise ManifestError("Отсутствует подтверждённая сборка") from exc
 
     regression_id = "reg-" + uuid.uuid4().hex
     folder = artifact_root / regression_id
