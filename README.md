@@ -47,8 +47,11 @@ uv run verilator-mcp
 | `lint_run` | Реальный ограниченный `verilator --lint-only`; никаких результатов симуляции |
 | `build_run` | Компиляция существующего SystemVerilog-тестбенча в изолированный каталог, без запуска |
 | `simulation_run` | Запуск проверенного бинарника, фиксация seed и результатов тестбенча |
+| `coverage_report` | Разбор реальных артефактов покрытия Verilator в ограниченный LCOV-отчёт |
 
-Подробности: [симуляция](docs/SIMULATION.md), [сборка](docs/BUILD.md), [lint](docs/LINT.md), [workspace](docs/WORKSPACE.md), [контракт инструментов](docs/TOOL_CONTRACT.md), [проверки](docs/TESTING.md), [совместимость](docs/COMPATIBILITY.md), [архитектура](docs/ARCHITECTURE.md), [план](docs/ROADMAP.md).
+Опциональные `coverage_line=true` и `assertions=true` при сборке не превращают отсутствие данных покрытия в 0%; результаты различают `NOT_OBSERVED`, `EMPTY` и `READY`.
+
+Подробности: [покрытие](docs/COVERAGE.md), [симуляция](docs/SIMULATION.md), [сборка](docs/BUILD.md), [lint](docs/LINT.md), [workspace](docs/WORKSPACE.md), [контракт инструментов](docs/TOOL_CONTRACT.md), [проверки](docs/TESTING.md), [совместимость](docs/COMPATIBILITY.md), [архитектура](docs/ARCHITECTURE.md), [план](docs/ROADMAP.md).
 
 ```bash
 uv run python -m unittest discover -s tests -v

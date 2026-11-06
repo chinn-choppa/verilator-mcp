@@ -47,8 +47,11 @@ Actual MCP client configuration formats vary. The operator sets existing, non-ov
 | `lint_run` | Run bounded real `verilator --lint-only`; never claim simulation PASS |
 | `build_run` | Compile an existing SystemVerilog testbench in isolated artifacts, without executing it |
 | `simulation_run` | Execute only a verified built binary and report seed/verdict evidence |
+| `coverage_report` | Convert actual Verilator coverage artifacts to a bounded LCOV summary |
 
-Read the [simulation contract](docs/SIMULATION.en.md), [build contract](docs/BUILD.en.md), [lint contract](docs/LINT.en.md), [workspace contract](docs/WORKSPACE.en.md), [tool contract](docs/TOOL_CONTRACT.en.md), [testing](docs/TESTING.en.md), [compatibility](docs/COMPATIBILITY.en.md), [architecture](docs/ARCHITECTURE.md), and [roadmap](docs/ROADMAP.md).
+Optional build `coverage_line=true` and `assertions=true` do not turn missing coverage into 0%; `NOT_OBSERVED`, `EMPTY` and `READY` are distinct states.
+
+Read the [coverage contract](docs/COVERAGE.en.md), [simulation contract](docs/SIMULATION.en.md), [build contract](docs/BUILD.en.md), [lint contract](docs/LINT.en.md), [workspace contract](docs/WORKSPACE.en.md), [tool contract](docs/TOOL_CONTRACT.en.md), [testing](docs/TESTING.en.md), [compatibility](docs/COMPATIBILITY.en.md), [architecture](docs/ARCHITECTURE.md), and [roadmap](docs/ROADMAP.md).
 
 ```bash
 uv run python -m unittest discover -s tests -v

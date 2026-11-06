@@ -13,6 +13,7 @@ All operations return JSON-compatible structures without exposing network listen
 | `lint_run(manifest_path, timeout_seconds=60)` | Run bounded real Verilator `--lint-only` | Yes |
 | `build_run(manifest_path, timeout_seconds=180)` | Compile existing SV testbench with `--binary`, do not simulate | Yes |
 | `simulation_run(build_id, timeout_seconds=30, seed=1)` | Execute a verified build artifact with explicit testbench evidence | Yes |
+| `coverage_report(run_id, timeout_seconds=20)` | Convert actual `coverage.dat` with Verilator into bounded LCOV summary | Yes |
 
 `tool_status` returns `tool`, `state`, `configured`, `executed=false`. States: `DETECTED_UNVERIFIED`, `NOT_FOUND`, `INVALID_OVERRIDE`. Local executable paths are not exposed.
 
@@ -23,3 +24,7 @@ All operations return JSON-compatible structures without exposing network listen
 Validation does not compile RTL, read RTL source contents, or create artifacts. `lint_run` invokes the actual executable after a version probe. It returns `lint_status`, `verification_verdict=NOT_RUN`, `executed`, `exit_code`, `tool_version`, `duration_ms`, `diagnostics`, `logs_truncated`, hashes and bounded artifact references. `NOT_AVAILABLE` and `NOT_RUN` do not imply lint success. For states including `TIMEOUT`, `INPUT_CHANGED`, `INCOMPLETE` and warnings, see [LINT.en.md](LINT.en.md). `build_run` requires `testbench_top`, checks the C++ toolchain and creates an executable. It returns `build_status`, `build_id`, `binary_sha256`, `binary_artifact`, `tool_versions`, `tool_sha256`, `source_sha256`, and `exit_code`. Both `simulation_status` and `verification_verdict` remain `NOT_RUN`. See [build contract](BUILD.en.md). `simulation_run` revalidates the built executable SHA-256 and returns `PASS`, `FAIL`, `INCONCLUSIVE` or `NOT_RUN` based on actual exit code, `$finish`, `$fatal`, and the self-checking token. Exit code 0 alone is not PASS. See [simulation contract](SIMULATION.en.md).
 
 There is no generic `run_command`, shell, Tcl/DO runner, or free-form Verilator flags. Verilator is not a full four-state simulator replacement.
+
+## Observed coverage and assertions (M3)
+
+`build_run` now supports strictly boolean `coverage_line=false` and `assertions=true`. `simulation_run` records observed `coverage_status` and `assertion_observation`. `coverage_report` produces `report_status` and actual `SF`/`DA` counts from `verilator_coverage --write-info`. It never invents percentages for absent tools, files, or coverage points. See [COVERAGE.en.md](COVERAGE.en.md).
