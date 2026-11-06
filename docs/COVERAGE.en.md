@@ -9,7 +9,9 @@
 - `coverage_line=true` adds **only** `--coverage-line` during compilation, not unsupported coverage modes.
 - `assertions=true` adds `--assert`, important for Verilator versions before 5.038 where assertions were disabled by default.
 
-No free-form Verilator flags. Boolean types are strictly validated. The build records `coverage_line_enabled` and `assertions_enabled`.
+Coverage-enabled builds use supported `--cc --exe --build --timing` with a **minimal C++ wrapper generated exclusively by the server**. Unlike Verilator 5.020's built-in `main()`, it explicitly calls `coveragep()->write("coverage.dat")` after model completion. The wrapper's SHA-256 is recorded in build evidence. Builds without coverage retain `--binary`.
+
+No caller-provided C++ or free-form CLI flags. Boolean inputs are strictly validated. The build records `coverage_line_enabled` and `assertions_enabled`.
 
 ## Capturing runtime data
 

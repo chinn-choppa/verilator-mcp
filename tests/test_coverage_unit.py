@@ -10,8 +10,21 @@ from pathlib import Path
 from unittest.mock import patch
 
 from verilator_mcp.coverage_report import coverage_report_project, parse_lcov_info
+from verilator_mcp.coverage_wrapper import coverage_main_source
 from verilator_mcp.execution import ProcessResult
 from verilator_mcp.workspace import ManifestError
+
+
+class CoverageWrapperTests(unittest.TestCase):
+    def test_safe_generated_cpp_includes_explicit_cov_write(self):
+        content = coverage_main_source("tb_good")
+        self.assertIn('#include "Vtb_good.h"', content)
+        self.assertIn('coveragep()->write("coverage.dat")', content)
+        self.assertIn("while (!context->gotFinish())", content)
+
+    def test_untrusted_cpp_name_rejected(self):
+        with self.assertRaises(ManifestError):
+            coverage_main_source("tb_good; system('bad')")
 
 
 class LCOVParserTests(unittest.TestCase):

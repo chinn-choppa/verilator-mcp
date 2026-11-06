@@ -21,7 +21,7 @@ Example manifest (all source paths are workspace-relative):
 
 The [tests/fixtures/build](../tests/fixtures/build/good.json) example uses original synthetic Apache-2.0 RTL. Nested JSON filelists are supported under the [workspace restrictions](WORKSPACE.en.md).
 
-The server constructs the entire command: `verilator --binary --timing --sv -Wall -Wno-fatal --top-module TB --Mdir ARTIFACT/obj`, followed by validated includes/defines/parameters/source files. The timeout is 10–600 seconds (default 180). MCP clients cannot submit arbitrary compiler switches, native `-f` filelists, scripts, shells, make targets, or output paths.
+The server constructs the entire command: `verilator --binary --timing --sv -Wall -Wno-fatal --top-module TB --Mdir ARTIFACT/obj`, followed by validated includes/defines/parameters/source files. For `coverage_line=true`, the server instead uses a trusted generated wrapper with `--cc --exe --build --coverage-line` and records its source SHA-256; see [COVERAGE.en.md](COVERAGE.en.md). The timeout is 10–600 seconds (default 180). MCP clients cannot submit arbitrary compiler switches, native `-f` filelists, scripts, shells, make targets, or output paths.
 
 ## Evidence and results
 
