@@ -15,7 +15,7 @@ from mcp import Client, StdioServerParameters
 from verilator_mcp.server import create_server
 
 EXPECTED_TOOLS = {
-    "server_info", "tool_status", "parse_diagnostics", "project_validate", "lint_run"
+    "server_info", "tool_status", "parse_diagnostics", "project_validate", "lint_run", "build_run"
 }
 
 
@@ -29,6 +29,7 @@ class MCPProtocolTests(unittest.IsolatedAsyncioTestCase):
             self.assertFalse(info.is_error)
             self.assertTrue(info.structured_content["eda_execution_supported"])
             self.assertFalse(info.structured_content["simulation_supported"])
+            self.assertTrue(info.structured_content["build_supported"])
             parsed = await client.call_tool("parse_diagnostics", {
                 "text": "%Error-UNSUPPORTED: rtl/top.sv:9:2: unsupported",
                 "limit": 10,
@@ -94,6 +95,11 @@ class MCPProtocolTests(unittest.IsolatedAsyncioTestCase):
                     self.assertEqual(missing.structured_content["lint_status"], "NOT_AVAILABLE")
                     self.assertFalse(missing.structured_content["executed"])
                     self.assertEqual(missing.structured_content["verification_verdict"], "NOT_RUN")
+                    self.assertEqual(list(artifacts.iterdir()), [])
+                    build = await client.call_tool("build_run", {
+                        "manifest_path": "project.json", "timeout_seconds": 100,
+                    })
+                    self.assertTrue(build.is_error)  # Нет обязательного testbench_top.
                     self.assertEqual(list(artifacts.iterdir()), [])
                     try:
                         bad = await client.call_tool("lint_run", {

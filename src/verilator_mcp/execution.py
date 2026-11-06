@@ -84,7 +84,7 @@ async def run_bounded(
     Функция намеренно не публикуется как MCP tool и не принимает свободную
     командную строку от MCP-клиента.
     """
-    if not argv or not 1 <= timeout_seconds <= 180:
+    if not argv or not 1 <= timeout_seconds <= 600:
         raise ValueError("Некорректный внутренний запрос запуска")
     flags = {}
     if os.name == "nt":

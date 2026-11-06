@@ -1,0 +1,6 @@
+{
+  "schema_version": 1,
+  "top": "tb_broken",
+  "testbench_top": "tb_broken",
+  "sources": ["tb/tb_broken.sv"]
+}

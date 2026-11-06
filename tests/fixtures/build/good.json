@@ -1,0 +1,6 @@
+{
+  "schema_version": 1,
+  "top": "counter",
+  "testbench_top": "tb_counter",
+  "sources": ["rtl/counter.sv", "tb/tb_counter.sv"]
+}

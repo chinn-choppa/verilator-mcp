@@ -4,7 +4,7 @@
 
 Переносимый локальный MCP-сервер для анализа и верификации RTL через Verilator. Независимый проект для FPGA/ASIC-инженеров и любых совместимых AI-агентов.
 
-**Статус: экспериментальный, реальный lint-only (0.0.1).** Verilator lint запускается только на явно разрешённом проекте. Сборка, моделирование и функциональная верификация пока не реализованы.
+**Статус: экспериментальный, lint и сборка (0.0.1).** На разрешённом проекте доступны проверка lint и компиляция существующего SystemVerilog-тестбенча. Симуляция и функциональная верификация пока не реализованы.
 
 ## Быстрый старт
 
@@ -45,8 +45,9 @@ uv run verilator-mcp
 | `parse_diagnostics` | Ограниченный структурированный разбор логов |
 | `project_validate` | Проверка локального JSON manifest и допустимых путей без выполнения EDA |
 | `lint_run` | Реальный ограниченный `verilator --lint-only`; никаких результатов симуляции |
+| `build_run` | Компиляция существующего SystemVerilog-тестбенча в изолированный каталог, без запуска |
 
-Подробности: [lint](docs/LINT.md), [workspace](docs/WORKSPACE.md), [контракт инструментов](docs/TOOL_CONTRACT.md), [проверки](docs/TESTING.md), [совместимость](docs/COMPATIBILITY.md), [архитектура](docs/ARCHITECTURE.md), [план](docs/ROADMAP.md).
+Подробности: [сборка](docs/BUILD.md), [lint](docs/LINT.md), [workspace](docs/WORKSPACE.md), [контракт инструментов](docs/TOOL_CONTRACT.md), [проверки](docs/TESTING.md), [совместимость](docs/COMPATIBILITY.md), [архитектура](docs/ARCHITECTURE.md), [план](docs/ROADMAP.md).
 
 ```bash
 uv run python -m unittest discover -s tests -v
