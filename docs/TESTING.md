@@ -49,10 +49,20 @@ Windows/MSYS2 Verilator и Python 3.15 до независимой приёмк�
 
 ## Реальное строковое покрытие (M3)
 
-Позитивный и негативные тесты LCOV дополняются настоящей GitHub Actions проверкой `verilator --binary --coverage-line` и `verilator_coverage --write-info` на публичном самопроверяющемся RTL.
+Позитивный и негативные тесты LCOV дополняются настоящей GitHub Actions проверкой инструментированной сборки `verilator --cc --exe --build --coverage-line` и `verilator_coverage --write-info` на публичном самопроверяющемся RTL.
 
 ```bash
 VERILATOR_MCP_RUN_INTEGRATION=1 uv run python -m unittest discover -s tests -p 'test_coverage_integration.py' -v
 ```
 
 Нулевой размер или отсутствие `coverage.dat` не считаются нулевым покрытием. Подробности: [COVERAGE.md](COVERAGE.md).
+
+## Реальная регрессия с фиксированными seed
+
+В Ubuntu CI к проверке симуляции добавлен настоящий вызов `regression_run` с разными исходами и повтором одинакового seed. В Windows CI выполняются unit, contract и negative проверки без реального EDA.
+
+```bash
+VERILATOR_MCP_RUN_INTEGRATION=1 uv run python -m unittest discover -s tests -p 'test_regression_integration.py' -v
+```
+
+См. [REGRESSION.md](REGRESSION.md).

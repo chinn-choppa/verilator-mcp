@@ -10,6 +10,7 @@ from .coverage_report import coverage_report_project
 from .diagnostics import parse_diagnostics_text
 from .lint import lint_run_project
 from .runtime import inspect_tool
+from .regression import RegressionCase, regression_run_project
 from .simulation import simulation_run_project
 from .workspace import validate_manifest
 
@@ -25,11 +26,11 @@ def create_server() -> MCPServer:
             "server": "verilator-mcp",
             "version": __version__,
             "vendor_tool": "verilator",
-            "stage": "coverage_ready",
+            "stage": "regression_ready",
             "operations": [
                 "server_info", "tool_status", "parse_diagnostics",
                 "project_validate", "lint_run", "build_run", "simulation_run",
-                "coverage_report",
+                "coverage_report", "regression_run",
             ],
             "eda_execution_supported": True,
             "simulation_supported": True,
@@ -75,6 +76,13 @@ def create_server() -> MCPServer:
     async def coverage_report(run_id: str, timeout_seconds: int = 20) -> dict[str, object]:
         """Проверить и разобрать реальные данные покрытия через verilator_coverage."""
         return await coverage_report_project(run_id, timeout_seconds)
+
+    @server.tool()
+    async def regression_run(
+        cases: list[RegressionCase], timeout_seconds: int = 30,
+    ) -> dict[str, object]:
+        """Выполнить до восьми проверенных симуляций с явными seed и verdict."""
+        return await regression_run_project(cases, timeout_seconds)
 
     return server
 

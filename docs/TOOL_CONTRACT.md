@@ -14,6 +14,7 @@
 | `build_run(manifest_path, timeout_seconds=180)` | Сборка существующего SV-тестбенча через `--binary`; симуляция не выполняется | Да |
 | `simulation_run(build_id, timeout_seconds=30, seed=1)` | Запуск проверенной сборки с явными доказательствами верификации | Да |
 | `coverage_report(run_id, timeout_seconds=20)` | Конвертация подтверждённого `coverage.dat` в LCOV и ограниченная сводка | Да |
+| `regression_run(cases, timeout_seconds=30)` | До 8 последовательных подтверждённых запусков с фиксированными seed | Да |
 
 `tool_status` возвращает `tool`, `state`, `configured`, `executed=false`. Состояния: `DETECTED_UNVERIFIED`, `NOT_FOUND`, `INVALID_OVERRIDE`. Пути локальной установки не раскрываются.
 
@@ -28,3 +29,7 @@
 ## Строковое покрытие и assertions (M3)
 
 `build_run` дополнен строго булевыми аргументами `coverage_line=false`, `assertions=true`. `simulation_run` сохраняет наблюдаемый `coverage_status` и `assertion_observation`. `coverage_report` возвращает `report_status` и реальные данные `SF`/`DA` после `verilator_coverage --write-info`. При отсутствии инструмента, файла, точек покрытия или полномочий не выдаёт мнимые проценты. См. [COVERAGE.md](COVERAGE.md).
+
+## Воспроизводимые регрессии (M3)
+
+`regression_run` принимает строго типизированные пары `build_id`/`seed`, проверяет все сборки заранее, а статусы выводит только из реальных `simulation_run`. Возвращает `regression_status`, `verification_verdict`, `counts`, `replay` и ссылки на индивидуальные артефакты. Невыполненный тест не считается PASS. См. [REGRESSION.md](REGRESSION.md).

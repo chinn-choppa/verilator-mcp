@@ -97,6 +97,13 @@ jobs:
         run: |
           ulimit -c 0
           uv run python -m unittest discover -s tests -p 'test_simulation_integration.py' -v
+      - name: Real seeded multi-case regression through MCP
+        env:
+          VERILATOR_MCP_RUN_INTEGRATION: '1'
+        shell: bash
+        run: |
+          ulimit -c 0
+          uv run python -m unittest discover -s tests -p 'test_regression_integration.py' -v
 
   real-verilator-coverage:
     runs-on: ubuntu-latest

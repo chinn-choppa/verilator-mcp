@@ -15,7 +15,7 @@ from mcp import Client, StdioServerParameters
 from verilator_mcp.server import create_server
 
 EXPECTED_TOOLS = {
-    "server_info", "tool_status", "parse_diagnostics", "project_validate", "lint_run", "build_run", "simulation_run", "coverage_report"
+    "server_info", "tool_status", "parse_diagnostics", "project_validate", "lint_run", "build_run", "simulation_run", "coverage_report", "regression_run"
 }
 
 

@@ -3,6 +3,9 @@
 ## [Unreleased]
 
 ### Added / Добавлено
+- Deterministic bounded multi-case regression with validated build provenance, per-case seeds and outcomes (#7).
+- Детерминированные последовательные регрессии с явными seed, корректными FAIL/INCONCLUSIVE/NOT_RUN и записью replay.
+
 - Opt-in line-coverage instrumentation, evidence-based assertion observations, bounded real `verilator_coverage` LCOV reports (#7, first slice).
 - Разбор фактических данных покрытия без фиктивного нулевого процента; отдельные состояния отсутствия или неполноты данных.
 
@@ -22,4 +25,4 @@
 
 ### Limits / Ограничения
 - Neither project validation nor a completed MCP request proves RTL correctness or simulation success.
-- Запуск Verilator, отмена длительных команд и приёмка Python 3.15 пока NOT_RUN.
+- Windows/MSYS2 реальный запуск EDA и приёмка Python 3.15 остаются NOT_RUN; подтверждённый Ubuntu lint/build/simulation/coverage выполняется в CI.

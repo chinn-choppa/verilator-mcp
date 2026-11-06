@@ -49,10 +49,20 @@ Windows/MSYS2 Verilator and Python 3.15 remain `NOT_RUN` pending independent acc
 
 ## Real line coverage (M3)
 
-Positive/negative LCOV parsing tests are joined by a real GitHub Actions run of `verilator --binary --coverage-line` and `verilator_coverage --write-info` against public self-checking RTL.
+Positive/negative LCOV parsing tests are joined by a real GitHub Actions run of instrumented `verilator --cc --exe --build --coverage-line` and `verilator_coverage --write-info` against public self-checking RTL.
 
 ```bash
 VERILATOR_MCP_RUN_INTEGRATION=1 uv run python -m unittest discover -s tests -p 'test_coverage_integration.py' -v
 ```
 
 Missing or empty `coverage.dat` is never interpreted as 0% coverage. See [COVERAGE.en.md](COVERAGE.en.md).
+
+## Real seeded regression
+
+Ubuntu CI additionally calls real `regression_run` with mixed verdicts and an identical-seed replay; Windows CI covers unit, contract and negative cases without claiming EDA execution.
+
+```bash
+VERILATOR_MCP_RUN_INTEGRATION=1 uv run python -m unittest discover -s tests -p 'test_regression_integration.py' -v
+```
+
+See [REGRESSION.en.md](REGRESSION.en.md).

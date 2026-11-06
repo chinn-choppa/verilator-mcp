@@ -14,6 +14,7 @@ All operations return JSON-compatible structures without exposing network listen
 | `build_run(manifest_path, timeout_seconds=180)` | Compile existing SV testbench with `--binary`, do not simulate | Yes |
 | `simulation_run(build_id, timeout_seconds=30, seed=1)` | Execute a verified build artifact with explicit testbench evidence | Yes |
 | `coverage_report(run_id, timeout_seconds=20)` | Convert actual `coverage.dat` with Verilator into bounded LCOV summary | Yes |
+| `regression_run(cases, timeout_seconds=30)` | Run up to 8 bounded seeded simulations with independent verdicts | Yes |
 
 `tool_status` returns `tool`, `state`, `configured`, `executed=false`. States: `DETECTED_UNVERIFIED`, `NOT_FOUND`, `INVALID_OVERRIDE`. Local executable paths are not exposed.
 
@@ -28,3 +29,7 @@ There is no generic `run_command`, shell, Tcl/DO runner, or free-form Verilator 
 ## Observed coverage and assertions (M3)
 
 `build_run` now supports strictly boolean `coverage_line=false` and `assertions=true`. `simulation_run` records observed `coverage_status` and `assertion_observation`. `coverage_report` produces `report_status` and actual `SF`/`DA` counts from `verilator_coverage --write-info`. It never invents percentages for absent tools, files, or coverage points. See [COVERAGE.en.md](COVERAGE.en.md).
+
+## Reproducible regressions (M3)
+
+`regression_run` accepts strictly typed `build_id`/`seed` pairs, verifies every build before execution and derives all statuses from real `simulation_run` results. It returns `regression_status`, `verification_verdict`, `counts`, `replay` and individual artifact references. A skipped case is never PASS. See [REGRESSION.en.md](REGRESSION.en.md).
