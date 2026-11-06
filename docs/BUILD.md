@@ -21,7 +21,7 @@
 
 Пример в [tests/fixtures/build](../tests/fixtures/build/good.json) использует искусственные исходники Apache-2.0. Вложенные JSON filelists разрешены при выполнении [ограничений workspace](WORKSPACE.md).
 
-Команда собирается исключительно сервером: `verilator --binary --timing --sv -Wall -Wno-fatal --top-module TB --Mdir ARTIFACT/obj` и разрешённые include/defines/parameters/sources. Сборка ограничена 10–600 секундами, по умолчанию 180 секунд. У клиента нет доступа к произвольным ключам компилятора, `-f`, скриптам, shell, make-целям или каталогам вывода.
+Команда собирается исключительно сервером: `verilator --binary --timing --sv -Wall -Wno-fatal --top-module TB --Mdir ARTIFACT/obj` и разрешённые include/defines/parameters/sources. При включении `coverage_line=true` вместо `--binary` используется безопасная сгенерированная обёртка с `--cc --exe --build --coverage-line` и отдельным SHA-256 её исходника; подробнее — [COVERAGE.md](COVERAGE.md). Сборка ограничена 10–600 секундами, по умолчанию 180 секунд. У клиента нет доступа к произвольным ключам компилятора, `-f`, скриптам, shell, make-целям или каталогам вывода.
 
 ## Доказательства результата
 

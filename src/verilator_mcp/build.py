@@ -9,6 +9,7 @@ import shutil
 import uuid
 from pathlib import Path
 
+from .coverage_wrapper import coverage_main_source
 from .execution import MAX_LOG_BYTES, ProcessResult, run_bounded
 from .lint import (
     _VERILATOR_VERSION, _arguments, _hash_sources, _public_text,
@@ -49,11 +50,24 @@ def _hash_file(path: Path, max_bytes: int = 268_435_456) -> str:
     return digest.hexdigest()
 
 
-def _build_arguments(project: RTLProject, folder: Path) -> list[str]:
+def _build_arguments(
+    project: RTLProject, folder: Path, *, coverage_line: bool = False,
+    assertions: bool = True, wrapper_path: Path | None = None,
+) -> list[str]:
     args = _arguments(project, folder)
-    args[0] = "--binary"
+    args[0] = "--cc" if coverage_line else "--binary"
     args.insert(1, "--timing")
+    if coverage_line:
+        if wrapper_path is None or wrapper_path.parent != folder:
+            raise ManifestError("Для покрытия требуется доверенная C++-обёртка")
+        args.insert(1, "--exe")
+        args.insert(2, "--build")
+        args.insert(3, "--coverage-line")
+    if assertions:
+        args.insert(2, "--assert")
     args[args.index("--top-module") + 1] = project.testbench_top
+    if coverage_line:
+        args.append(str(wrapper_path))
     return args
 
 
@@ -68,10 +82,15 @@ def _output_binary(project: RTLProject, folder: Path) -> Path:
     return resolved
 
 
-async def build_run_project(manifest_path: str, timeout_seconds: int = 180) -> dict[str, object]:
+async def build_run_project(
+    manifest_path: str, timeout_seconds: int = 180,
+    coverage_line: bool = False, assertions: bool = True,
+) -> dict[str, object]:
     """Сборка SV testbench, не выполняющая полученный бинарник."""
     if type(timeout_seconds) is not int or not 10 <= timeout_seconds <= 600:
         raise ManifestError("timeout_seconds для сборки должен быть целым 10..600")
+    if type(coverage_line) is not bool or type(assertions) is not bool:
+        raise ManifestError("coverage_line и assertions должны быть булевыми значениями")
     project = validate_manifest(manifest_path)
     if not project.testbench_top:
         raise ManifestError("Для сборки требуется testbench_top в manifest")
@@ -97,13 +116,26 @@ async def build_run_project(manifest_path: str, timeout_seconds: int = 180) -> d
     folder = project.artifact_root / run_id
     folder.mkdir(mode=0o700, exist_ok=False)
 
-    args = _build_arguments(project, folder)
+    wrapper_path: Path | None = None
+    wrapper_sha256: str | None = None
+    if coverage_line:
+        wrapper_path = folder / "coverage_main.cpp"
+        wrapper_text = coverage_main_source(project.testbench_top)
+        wrapper_sha256 = hashlib.sha256(wrapper_text.encode("utf-8")).hexdigest()
+        _save_artifact(wrapper_path, wrapper_text)
+    args = _build_arguments(
+        project, folder, coverage_line=coverage_line,
+        assertions=assertions, wrapper_path=wrapper_path,
+    )
     build_request = {
         **config, "build_id": run_id,
         "argv": ["<VERILATOR>", *[_public_text(x, project, executable) for x in args]],
         "source_sha256": hashes,
         "source_hash_scope": "explicit_sources_only",
         "timeout_seconds": timeout_seconds,
+        "coverage_line_enabled": coverage_line,
+        "assertions_enabled": assertions,
+        "generated_wrapper_sha256": wrapper_sha256,
     }
     _save_artifact(folder / "request.json", json.dumps(build_request, indent=2, ensure_ascii=False))
 
@@ -196,6 +228,9 @@ async def build_run_project(manifest_path: str, timeout_seconds: int = 180) -> d
         "duration_ms": proc.duration_ms,
         "logs_truncated": truncated,
         "build_id": run_id,
+        "coverage_line_enabled": coverage_line,
+        "assertions_enabled": assertions,
+        "generated_wrapper_sha256": wrapper_sha256,
         "tool_versions": versions,
         "tool_sha256": tool_hashes,
         "config_sha256": config["config_sha256"],

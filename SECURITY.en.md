@@ -26,6 +26,10 @@ Lint success is not a functional verification verdict, and Verilator is not equi
 
 `simulation_run` executes only a previously successful build artifact, verifies its SHA-256, and restricts `build_id`. The executable can still access files/network with the MCP process privileges. Use OS isolation for untrusted RTL. A `PASS` marker only indicates observed self-checking testbench completion, not general DUT correctness.
 
+## Line coverage
+
+Instrumented `build_run` adds only approved `--coverage-line` and `--assert` flags. `coverage_report` invokes a separately trusted `verilator_coverage` on bounded artifacts inside the operator-controlled root; the server selects output paths. Line rates are calculated from actual LCOV records only and do not prove functional correctness. Raw artifacts and reports may disclose RTL source paths; review them before sharing.
+
 ## Supported versions
 
 The project is experimental; a stable support policy is not yet established. Vulnerability reports are handled individually.

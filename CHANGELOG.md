@@ -3,6 +3,9 @@
 ## [Unreleased]
 
 ### Added / Добавлено
+- Opt-in line-coverage instrumentation, evidence-based assertion observations, bounded real `verilator_coverage` LCOV reports (#7, first slice).
+- Разбор фактических данных покрытия без фиктивного нулевого процента; отдельные состояния отсутствия или неполноты данных.
+
 - Verified binary execution and reproducible seeds; explicit PASS/FAIL/INCONCLUSIVE/NOT_RUN with `$finish`, `$fatal`, and watchdog evidence (#6).
 - Безопасный запуск только результатов сборки, фиксация seed, контроль SHA-256 и отдельные проверки отмены.
 

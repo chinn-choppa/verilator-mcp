@@ -6,6 +6,7 @@ from mcp.server import MCPServer
 
 from . import __version__
 from .build import build_run_project
+from .coverage_report import coverage_report_project
 from .diagnostics import parse_diagnostics_text
 from .lint import lint_run_project
 from .runtime import inspect_tool
@@ -24,10 +25,11 @@ def create_server() -> MCPServer:
             "server": "verilator-mcp",
             "version": __version__,
             "vendor_tool": "verilator",
-            "stage": "simulation_ready",
+            "stage": "coverage_ready",
             "operations": [
                 "server_info", "tool_status", "parse_diagnostics",
                 "project_validate", "lint_run", "build_run", "simulation_run",
+                "coverage_report",
             ],
             "eda_execution_supported": True,
             "simulation_supported": True,
@@ -55,9 +57,12 @@ def create_server() -> MCPServer:
         return await lint_run_project(manifest_path, timeout_seconds)
 
     @server.tool()
-    async def build_run(manifest_path: str, timeout_seconds: int = 180) -> dict[str, object]:
+    async def build_run(
+        manifest_path: str, timeout_seconds: int = 180,
+        coverage_line: bool = False, assertions: bool = True,
+    ) -> dict[str, object]:
         """Собрать существующий SystemVerilog тестбенч, не запуская симуляцию."""
-        return await build_run_project(manifest_path, timeout_seconds)
+        return await build_run_project(manifest_path, timeout_seconds, coverage_line, assertions)
 
     @server.tool()
     async def simulation_run(
@@ -65,6 +70,11 @@ def create_server() -> MCPServer:
     ) -> dict[str, object]:
         """Запустить только подтверждённую сборку; PASS требует свидетельства из TB."""
         return await simulation_run_project(build_id, timeout_seconds, seed)
+
+    @server.tool()
+    async def coverage_report(run_id: str, timeout_seconds: int = 20) -> dict[str, object]:
+        """Проверить и разобрать реальные данные покрытия через verilator_coverage."""
+        return await coverage_report_project(run_id, timeout_seconds)
 
     return server
 

@@ -46,3 +46,13 @@ VERILATOR_MCP_RUN_INTEGRATION=1 uv run python -m unittest discover -s tests -p '
 ```
 
 Windows/MSYS2 Verilator and Python 3.15 remain `NOT_RUN` pending independent acceptance. See [SIMULATION.en.md](SIMULATION.en.md).
+
+## Real line coverage (M3)
+
+Positive/negative LCOV parsing tests are joined by a real GitHub Actions run of `verilator --binary --coverage-line` and `verilator_coverage --write-info` against public self-checking RTL.
+
+```bash
+VERILATOR_MCP_RUN_INTEGRATION=1 uv run python -m unittest discover -s tests -p 'test_coverage_integration.py' -v
+```
+
+Missing or empty `coverage.dat` is never interpreted as 0% coverage. See [COVERAGE.en.md](COVERAGE.en.md).

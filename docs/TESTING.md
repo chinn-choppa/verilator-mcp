@@ -46,3 +46,13 @@ VERILATOR_MCP_RUN_INTEGRATION=1 uv run python -m unittest discover -s tests -p '
 ```
 
 Windows/MSYS2 Verilator и Python 3.15 до независимой приёмки — `NOT_RUN`. Контракт: [SIMULATION.md](SIMULATION.md).
+
+## Реальное строковое покрытие (M3)
+
+Позитивный и негативные тесты LCOV дополняются настоящей GitHub Actions проверкой `verilator --binary --coverage-line` и `verilator_coverage --write-info` на публичном самопроверяющемся RTL.
+
+```bash
+VERILATOR_MCP_RUN_INTEGRATION=1 uv run python -m unittest discover -s tests -p 'test_coverage_integration.py' -v
+```
+
+Нулевой размер или отсутствие `coverage.dat` не считаются нулевым покрытием. Подробности: [COVERAGE.md](COVERAGE.md).
