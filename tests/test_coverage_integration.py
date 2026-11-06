@@ -44,7 +44,7 @@ class CoverageIntegrationTests(unittest.IsolatedAsyncioTestCase):
                     })
                     self.assertFalse(sim.is_error, str(sim.content))
                     simulation = sim.structured_content
-                    self.assertEqual(simulation["verification_verdict"], "PASS")
+                    self.assertEqual(simulation["verification_verdict"], "PASS", simulation)
                     self.assertEqual(simulation["coverage_status"], "RECORDED", simulation)
 
                     result = await client.call_tool("coverage_report", {

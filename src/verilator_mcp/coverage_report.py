@@ -38,6 +38,7 @@ def _trusted_coverage_tool() -> Path | None:
 
 def _safe_source(source: str, workspace: Path) -> str:
     """Не выводить абсолютные имена файлов вне разрешённого проекта."""
+    workspace = workspace.resolve(strict=False)
     path = Path(source)
     try:
         resolved = (path if path.is_absolute() else workspace / path).resolve(strict=False)

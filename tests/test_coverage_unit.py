@@ -95,7 +95,7 @@ class CoverageToolTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(result["summary"]["line_rate"], 0.5)
         self.assertEqual(result["simulation_verdict"], "PASS")
         self.assertEqual(commands[0][1], "--write-info")
-        self.assertEqual(commands[0][-1], str(self.folder / "coverage.dat"))
+        self.assertEqual(Path(commands[0][-1]).resolve(), (self.folder / "coverage.dat").resolve())
         self.assertTrue((self.folder / "coverage_report.json").is_file())
 
     async def test_missing_data_is_not_zero_coverage(self):
