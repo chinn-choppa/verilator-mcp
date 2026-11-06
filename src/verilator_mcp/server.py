@@ -5,6 +5,7 @@ from __future__ import annotations
 from mcp.server import MCPServer
 
 from . import __version__
+from .build import build_run_project
 from .diagnostics import parse_diagnostics_text
 from .lint import lint_run_project
 from .runtime import inspect_tool
@@ -22,13 +23,14 @@ def create_server() -> MCPServer:
             "server": "verilator-mcp",
             "version": __version__,
             "vendor_tool": "verilator",
-            "stage": "lint_only",
+            "stage": "build_ready",
             "operations": [
                 "server_info", "tool_status", "parse_diagnostics",
-                "project_validate", "lint_run",
+                "project_validate", "lint_run", "build_run",
             ],
             "eda_execution_supported": True,
             "simulation_supported": False,
+            "build_supported": True,
         }
 
     @server.tool()
@@ -50,6 +52,11 @@ def create_server() -> MCPServer:
     async def lint_run(manifest_path: str, timeout_seconds: int = 60) -> dict[str, object]:
         """Выполнить только Verilator lint; не подтверждать функциональную верификацию."""
         return await lint_run_project(manifest_path, timeout_seconds)
+
+    @server.tool()
+    async def build_run(manifest_path: str, timeout_seconds: int = 180) -> dict[str, object]:
+        """Собрать существующий SystemVerilog тестбенч, не запуская симуляцию."""
+        return await build_run_project(manifest_path, timeout_seconds)
 
     return server
 

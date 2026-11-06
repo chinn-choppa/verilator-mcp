@@ -3,6 +3,9 @@
 ## [Unreleased]
 
 ### Added / Добавлено
+- Safe `build_run`: real `--binary` compilation of existing self-checking SV testbenches with toolchain provenance and output hashing (#5).
+- Сборка реального тестбенча без запуска: отдельные артефакты, тайм-ауты, проверки C++/make, негативные тесты на синтаксические ошибки.
+
 - Real bounded Verilator lint with version probe, exit status, source hashes, diagnostics and local artifacts (#4).
 - Реальный lint-only, управление дочерними процессами, ограничение журналов и проверка RTL на открытых фикстурах.
 - Explicitly no simulation verdict and no free shell or native filelist arguments.
