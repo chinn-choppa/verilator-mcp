@@ -1,0 +1,6 @@
+{
+  "schema_version": 1,
+  "top": "tb_timeout",
+  "testbench_top": "tb_timeout",
+  "sources": ["tb/tb_timeout.sv"]
+}

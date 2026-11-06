@@ -9,6 +9,7 @@ from .build import build_run_project
 from .diagnostics import parse_diagnostics_text
 from .lint import lint_run_project
 from .runtime import inspect_tool
+from .simulation import simulation_run_project
 from .workspace import validate_manifest
 
 
@@ -23,13 +24,13 @@ def create_server() -> MCPServer:
             "server": "verilator-mcp",
             "version": __version__,
             "vendor_tool": "verilator",
-            "stage": "build_ready",
+            "stage": "simulation_ready",
             "operations": [
                 "server_info", "tool_status", "parse_diagnostics",
-                "project_validate", "lint_run", "build_run",
+                "project_validate", "lint_run", "build_run", "simulation_run",
             ],
             "eda_execution_supported": True,
-            "simulation_supported": False,
+            "simulation_supported": True,
             "build_supported": True,
         }
 
@@ -57,6 +58,13 @@ def create_server() -> MCPServer:
     async def build_run(manifest_path: str, timeout_seconds: int = 180) -> dict[str, object]:
         """Собрать существующий SystemVerilog тестбенч, не запуская симуляцию."""
         return await build_run_project(manifest_path, timeout_seconds)
+
+    @server.tool()
+    async def simulation_run(
+        build_id: str, timeout_seconds: int = 30, seed: int = 1,
+    ) -> dict[str, object]:
+        """Запустить только подтверждённую сборку; PASS требует свидетельства из TB."""
+        return await simulation_run_project(build_id, timeout_seconds, seed)
 
     return server
 
