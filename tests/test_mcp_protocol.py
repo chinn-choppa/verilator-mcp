@@ -15,7 +15,7 @@ from mcp import Client, StdioServerParameters
 from verilator_mcp.server import create_server
 
 EXPECTED_TOOLS = {
-    "server_info", "tool_status", "parse_diagnostics", "project_validate", "lint_run", "build_run"
+    "server_info", "tool_status", "parse_diagnostics", "project_validate", "lint_run", "build_run", "simulation_run"
 }
 
 
@@ -28,7 +28,7 @@ class MCPProtocolTests(unittest.IsolatedAsyncioTestCase):
             info = await client.call_tool("server_info", {})
             self.assertFalse(info.is_error)
             self.assertTrue(info.structured_content["eda_execution_supported"])
-            self.assertFalse(info.structured_content["simulation_supported"])
+            self.assertTrue(info.structured_content["simulation_supported"])
             self.assertTrue(info.structured_content["build_supported"])
             parsed = await client.call_tool("parse_diagnostics", {
                 "text": "%Error-UNSUPPORTED: rtl/top.sv:9:2: unsupported",

@@ -37,13 +37,13 @@ class ServerStubTests(unittest.TestCase):
                 self.assertEqual(
                     set(server.tools), {
                         "server_info", "tool_status", "parse_diagnostics",
-                        "project_validate", "lint_run", "build_run",
+                        "project_validate", "lint_run", "build_run", "simulation_run",
                     },
                 )
                 info = server.tools["server_info"]()
-                self.assertEqual(info["stage"], "build_ready")
+                self.assertEqual(info["stage"], "simulation_ready")
                 self.assertTrue(info["eda_execution_supported"])
-                self.assertFalse(info["simulation_supported"])
+                self.assertTrue(info["simulation_supported"])
                 self.assertTrue(info["build_supported"])
                 self.assertEqual(server.tools["parse_diagnostics"]("", limit=1)["count"], 0)
             finally:

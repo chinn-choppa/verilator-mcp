@@ -1,0 +1,6 @@
+{
+  "schema_version": 1,
+  "top": "tb_unknown",
+  "testbench_top": "tb_unknown",
+  "sources": ["tb/tb_unknown.sv"]
+}

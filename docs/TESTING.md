@@ -36,3 +36,13 @@ VERILATOR_MCP_RUN_INTEGRATION=1 uv run python -m unittest discover -s tests -p '
 ```
 
 Без флага тест честно пропускается как `REAL_VERILATOR_NOT_RUN`. На Windows запускаются настоящие процессные тесты тайм-аута/логов, но Verilator/MSYS2 остаётся `NOT_RUN` до самостоятельной приёмки. См. [LINT.md](LINT.md).
+
+## Настоящая симуляция и результаты тестбенча
+
+Отдельная Ubuntu CI job собирает и выполняет четыре публичных тестбенча: успешная самопроверка, `$fatal`, `$finish` без маркера и watchdog. Unit-тест дополнительно проверяет реальную отмену дочернего процесса.
+
+```bash
+VERILATOR_MCP_RUN_INTEGRATION=1 uv run python -m unittest discover -s tests -p 'test_simulation_integration.py' -v
+```
+
+Windows/MSYS2 Verilator и Python 3.15 до независимой приёмки — `NOT_RUN`. Контракт: [SIMULATION.md](SIMULATION.md).
