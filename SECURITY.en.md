@@ -22,6 +22,10 @@ Local raw logs can include RTL details. MCP clients and models may transmit tool
 
 Lint success is not a functional verification verdict, and Verilator is not equivalent to a complete four-state simulator.
 
+## Simulation execution
+
+`simulation_run` executes only a previously successful build artifact, verifies its SHA-256, and restricts `build_id`. The executable can still access files/network with the MCP process privileges. Use OS isolation for untrusted RTL. A `PASS` marker only indicates observed self-checking testbench completion, not general DUT correctness.
+
 ## Supported versions
 
 The project is experimental; a stable support policy is not yet established. Vulnerability reports are handled individually.

@@ -3,6 +3,9 @@
 ## [Unreleased]
 
 ### Added / Добавлено
+- Verified binary execution and reproducible seeds; explicit PASS/FAIL/INCONCLUSIVE/NOT_RUN with `$finish`, `$fatal`, and watchdog evidence (#6).
+- Безопасный запуск только результатов сборки, фиксация seed, контроль SHA-256 и отдельные проверки отмены.
+
 - Safe `build_run`: real `--binary` compilation of existing self-checking SV testbenches with toolchain provenance and output hashing (#5).
 - Сборка реального тестбенча без запуска: отдельные артефакты, тайм-ауты, проверки C++/make, негативные тесты на синтаксические ошибки.
 

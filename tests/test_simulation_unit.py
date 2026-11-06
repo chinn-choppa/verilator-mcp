@@ -94,7 +94,7 @@ class SimulationUnitTests(unittest.IsolatedAsyncioTestCase):
         self.assertTrue(result["pass_marker_observed"])
         self.assertEqual(result["seed"], 42)
         self.assertEqual(len(calls), 1)
-        self.assertEqual(calls[0][0], str(self.binary))
+        self.assertEqual(Path(calls[0][0]).resolve(), self.binary.resolve())
         self.assertEqual(calls[0][1], "+verilator+seed+42")
         self.assertTrue(calls[0][2].startswith("+VERILATOR_MCP_TOKEN="))
         self.assertTrue((self.artifacts / result["artifacts"]["result"]).is_file())

@@ -4,7 +4,7 @@
 
 A portable, local-first Verilator MCP server for RTL engineering with any compatible AI agent. Independently maintained for the FPGA/ASIC community.
 
-**Status: experimental, lint and testbench build (0.0.1).** Bounded lint and compilation of an existing SystemVerilog testbench work against operator-approved RTL. Simulation and functional verification are not yet implemented.
+**Status: experimental (0.0.1).** Real lint, build and execution of existing SystemVerilog testbenches with explicit self-checking evidence are supported. Coverage and structured assertion reports are not yet implemented.
 
 ## Quick start
 
@@ -46,8 +46,9 @@ Actual MCP client configuration formats vary. The operator sets existing, non-ov
 | `project_validate` | Validate a local JSON manifest and paths without EDA execution |
 | `lint_run` | Run bounded real `verilator --lint-only`; never claim simulation PASS |
 | `build_run` | Compile an existing SystemVerilog testbench in isolated artifacts, without executing it |
+| `simulation_run` | Execute only a verified built binary and report seed/verdict evidence |
 
-Read the [build contract](docs/BUILD.en.md), [lint contract](docs/LINT.en.md), [workspace contract](docs/WORKSPACE.en.md), [tool contract](docs/TOOL_CONTRACT.en.md), [testing](docs/TESTING.en.md), [compatibility](docs/COMPATIBILITY.en.md), [architecture](docs/ARCHITECTURE.md), and [roadmap](docs/ROADMAP.md).
+Read the [simulation contract](docs/SIMULATION.en.md), [build contract](docs/BUILD.en.md), [lint contract](docs/LINT.en.md), [workspace contract](docs/WORKSPACE.en.md), [tool contract](docs/TOOL_CONTRACT.en.md), [testing](docs/TESTING.en.md), [compatibility](docs/COMPATIBILITY.en.md), [architecture](docs/ARCHITECTURE.md), and [roadmap](docs/ROADMAP.md).
 
 ```bash
 uv run python -m unittest discover -s tests -v

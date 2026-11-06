@@ -36,3 +36,13 @@ VERILATOR_MCP_RUN_INTEGRATION=1 uv run python -m unittest discover -s tests -p '
 ```
 
 Without the flag, the test explicitly skips as `REAL_VERILATOR_NOT_RUN`. Windows runs actual process timeout/log bounds tests, but Verilator/MSYS2 remains `NOT_RUN` pending independent acceptance. See [LINT.en.md](LINT.en.md).
+
+## Real simulation verdicts
+
+A dedicated Ubuntu CI job builds and executes four public testbenches: passing self-check, `$fatal`, `$finish` without evidence, and watchdog. The unit suite also tests cancellation of a real child process.
+
+```bash
+VERILATOR_MCP_RUN_INTEGRATION=1 uv run python -m unittest discover -s tests -p 'test_simulation_integration.py' -v
+```
+
+Windows/MSYS2 Verilator and Python 3.15 remain `NOT_RUN` pending independent acceptance. See [SIMULATION.en.md](SIMULATION.en.md).
