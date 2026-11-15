@@ -1,13 +1,13 @@
-# История изменений
-
-Все существенные изменения будут отражаться здесь. Формат основан на Keep a Changelog; версии планируются по SemVer после стабилизации публичного интерфейса.
+# История изменений / Changelog
 
 ## [Unreleased]
 
-### Добавлено
-- Независимый Python-пакет и точка входа stdio MCP.
-- Инструменты `server_info`, `tool_status`, `parse_diagnostics` для первичного прототипа.
-- Политика безопасности, контракт результатов, CI, дорожная карта и руководство для участников.
+### Added / Добавлено
+- Тесты реальных MCP `initialize`, `tools/list`, `tools/call` через JSON-RPC в памяти и локальный stdio.
+- Real MCP client protocol tests using the official v2 SDK, in-memory and stdio.
+- CI matrix with `uv` on Linux/Windows and Python 3.11/3.13/3.14.
+- Двуязычные руководства по тестированию и совместимости / bilingual testing and compatibility guides.
 
-### Ограничения
-- EDA-сборка, синтез, симуляция, отчёты и живой MCP-вызов не были проверены в исходной среде подготовки.
+### Limits / Ограничения
+- No EDA execution is introduced in this change; cancellation, Verilator and Python 3.15 acceptance remain NOT_RUN.
+- Запуск Verilator, отмена длительных команд и приёмка Python 3.15 требуют самостоятельной проверки.
