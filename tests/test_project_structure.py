@@ -1,29 +1,27 @@
-"""Структурные проверки публичного репозитория."""
-
-import tomllib
-import unittest
+"""Проверки структуры публичного пакета с pytest."""
 from pathlib import Path
+import tomllib
+
+import pytest
 
 
-class ProjectStructureTests(unittest.TestCase):
-    def test_required_public_files(self):
-        root = Path(__file__).resolve().parents[1]
-        for name in (
-            "README.md", "README.en.md", "CONTRIBUTING.md", "SECURITY.md",
-            "CODE_OF_CONDUCT.md", "LICENSE", "AGENTS.md", "CHANGELOG.md",
-            ".github/workflows/ci.yml", "docs/ARCHITECTURE.md",
-            "docs/TOOL_CONTRACT.md", "docs/TESTING.md", "docs/ROADMAP.md",
-        ):
-            with self.subTest(name=name):
-                self.assertTrue((root / name).is_file())
-
-    def test_pyproject_exposes_console_script(self):
-        root = Path(__file__).resolve().parents[1]
-        data = tomllib.loads((root / "pyproject.toml").read_text(encoding="utf-8"))
-        self.assertEqual(data["project"]["name"], root.name)
-        self.assertIn(root.name, data["project"]["scripts"])
-        self.assertIn("mcp==2.3.0", data["project"]["dependencies"])
+ROOT = Path(__file__).resolve().parents[1]
 
 
-if __name__ == "__main__":
-    unittest.main()
+@pytest.mark.parametrize("relative", [
+    "README.md", "README.en.md", "CONTRIBUTING.md", "SECURITY.md",
+    "CODE_OF_CONDUCT.md", "LICENSE", "AGENTS.md", "CHANGELOG.md",
+    ".github/workflows/ci.yml", "docs/ARCHITECTURE.md",
+    "docs/TOOL_CONTRACT.md", "docs/TESTING.md", "docs/ROADMAP.md",
+    "uv.lock",
+])
+def test_required_public_file(relative):
+    assert (ROOT / relative).is_file(), relative
+
+
+def test_pyproject_exposes_console_script():
+    data = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))
+    assert data["project"]["name"] == ROOT.name
+    assert ROOT.name in data["project"]["scripts"]
+    assert "mcp==2.3.0" in data["project"]["dependencies"]
+    assert "pytest==9.2.0" in data["dependency-groups"]["dev"]

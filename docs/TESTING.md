@@ -3,7 +3,7 @@
 ## Быстрые проверки без EDA и внешней сети
 
 ```bash
-PYTHONPATH=src python -m unittest discover -s tests -v
+PYTHONPATH=src uv run --locked pytest -q tests
 python -m compileall -q src tests
 ```
 
@@ -11,7 +11,7 @@ PowerShell:
 
 ```powershell
 $env:PYTHONPATH = "src"
-python -m unittest discover -s tests -v
+uv run --locked pytest -q tests
 python -m compileall -q src tests
 Remove-Item Env:PYTHONPATH
 ```
@@ -28,3 +28,11 @@ uv run verilator-mcp
 ## Реальное EDA-тестирование
 
 **Пока не предусмотрено** в bootstrap. После появления команд выполняйте на публичных минимальных RTL-проектах: lint, негативный кейс, сбой лицензии/тайм-аут, успешное завершение по самопроверяющемуся тесту, повреждённый файл, неверный путь и ограничение каталогов. Записывайте версии и SHA используемых исходников.
+
+## Pytest и зависимости
+
+Канонический запуск: `uv sync --locked`, затем `uv run --locked pytest -q tests`.
+`pytest==9.2.0` установлен в dev dependency group. Отсутствующий MCP SDK
+считается ошибкой теста, а не автоматически пропускаемым случаем.
+Нативные fixtures `monkeypatch`, `tmp_path` и параметризация применяются
+без `unittest`. Протокол MCP и реальное EDA остаются отдельной приёмкой.
