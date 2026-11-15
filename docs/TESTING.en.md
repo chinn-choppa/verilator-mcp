@@ -7,9 +7,9 @@
 The tests use the official MCP SDK, never a fake server.
 
 ```bash
-uv sync
-uv run python -m compileall -q src tests
-uv run python -m unittest discover -s tests -v
+uv sync --locked
+uv run --locked python -m compileall -q src tests
+uv run --locked pytest -q tests
 ```
 
 `tests/test_mcp_protocol.py` exercises two distinct paths:
@@ -19,7 +19,7 @@ uv run python -m unittest discover -s tests -v
 
 Negative cases cover invalid types and oversized input. Any rejected tool call must not be reported as `is_error=false`. Stray output on stdout would corrupt the stdio protocol.
 
-CI runs on Ubuntu and Windows with Python 3.11, 3.13, and 3.14. A successful protocol call establishes only `MCP_TOOL_PASS`, not `EDA_PASS`.
+CI checks Ubuntu and Windows with Python 3.11, 3.13, and 3.14. A successful protocol call establishes only `MCP_TOOL_PASS`, not `EDA_PASS`.
 
 ## Acceptance boundaries
 

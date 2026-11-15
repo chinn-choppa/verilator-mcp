@@ -7,9 +7,9 @@
 Все проверки используют официальный SDK, а не подмену сервера.
 
 ```bash
-uv sync
-uv run python -m compileall -q src tests
-uv run python -m unittest discover -s tests -v
+uv sync --locked
+uv run --locked python -m compileall -q src tests
+uv run --locked pytest -q tests
 ```
 
 `tests/test_mcp_protocol.py` проверяет два отдельных сценария:
@@ -19,7 +19,7 @@ uv run python -m unittest discover -s tests -v
 
 Негативные сценарии включают неверные типы и превышение лимита текста. При неуспешном вызове тест не допускает `is_error=false`. Любые посторонние данные в stdout нарушают протокол stdio.
 
-CI выполняет эти тесты на Ubuntu и Windows с Python 3.11, 3.13, 3.14. Успешный протокольный вызов означает только `MCP_TOOL_PASS`, но не `EDA_PASS`.
+CI проверяет эти тесты на Ubuntu и Windows с Python 3.11, 3.13, 3.14. Успешный протокольный вызов означает только `MCP_TOOL_PASS`, но не `EDA_PASS`.
 
 ## Границы приёмки
 

@@ -8,9 +8,8 @@ permissions:
   contents: read
 
 jobs:
-  unit-and-mcp:
+  unit:
     runs-on: ${{ matrix.os }}
-    timeout-minutes: 15
     strategy:
       fail-fast: false
       matrix:
@@ -18,14 +17,22 @@ jobs:
         python-version: ['3.11', '3.13', '3.14']
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+      - uses: astral-sh/setup-uv@07a047e608db84b3d8c06cd9a7c7dcc9c355c18e # v10.3.2
         with:
-          python-version: ${{ matrix.python-version }}
-      - name: Bootstrap uv
-        run: python -m pip install --disable-pip-version-check uv
-      - name: Install project dependencies with uv
-        run: uv sync --python python
-      - name: Compile Python sources
-        run: uv run python -m compileall -q src tests
-      - name: Run complete unit and real MCP protocol tests
-        run: uv run python -m unittest discover -s tests -v
+          version: "0.13.6"
+          enable-cache: false
+      - name: Install managed Python
+        shell: bash
+        run: uv python install "${{ matrix.python-version }}"
+      - name: Verify committed uv.lock is current
+        shell: bash
+        run: uv lock --check
+      - name: Install pinned project and pytest
+        shell: bash
+        run: uv sync --locked --python "${{ matrix.python-version }}"
+      - name: Compile source and tests
+        shell: bash
+        run: uv run --locked python -m compileall -q src tests
+      - name: Run native pytest suite with real MCP SDK
+        shell: bash
+        run: uv run --locked pytest -q tests
