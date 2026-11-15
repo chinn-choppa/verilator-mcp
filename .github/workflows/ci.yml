@@ -17,16 +17,22 @@ jobs:
         python-version: ['3.11', '3.13']
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+      - uses: astral-sh/setup-uv@07a047e608db84b3d8c06cd9a7c7dcc9c355c18e # v10.3.2
         with:
-          python-version: ${{ matrix.python-version }}
-      - name: Test domain logic (offline capable)
+          version: "0.13.6"
+          enable-cache: false
+      - name: Install managed Python
         shell: bash
-        run: |
-          python -m compileall -q src tests
-          PYTHONPATH=src python -m unittest discover -s tests -v
-      - name: Test MCP SDK server construction
+        run: uv python install "${{ matrix.python-version }}"
+      - name: Verify committed uv.lock is current
         shell: bash
-        run: |
-          python -m pip install -e .
-          python -m unittest discover -s tests -p 'test_server.py' -v
+        run: uv lock --check
+      - name: Install pinned project and pytest
+        shell: bash
+        run: uv sync --locked --python "${{ matrix.python-version }}"
+      - name: Compile source and tests
+        shell: bash
+        run: uv run --locked python -m compileall -q src tests
+      - name: Run native pytest suite with real MCP SDK
+        shell: bash
+        run: uv run --locked pytest -q tests
